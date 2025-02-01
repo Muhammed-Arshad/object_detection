@@ -21,6 +21,7 @@ class ObjectSelectionScreen extends StatelessWidget {
           ...['Laptop', 'Mobile', 'Mouse', 'Bottle'].map((object) => ListTile(
             title: Text(object),
             onTap: () {
+              // Store the selected object
               provider.setSelectedObject(object.toLowerCase());
               Navigator.push(
                 context,

@@ -2,8 +2,6 @@ import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:tflite_v2/tflite_v2.dart';
-// import 'package:tflite/tflite.dart';
-// import 'package:tflite_flutter/tflite_flutter.dart';
 import '../provider/detection_provider.dart';
 import 'image_display_screen.dart';
 
@@ -19,8 +17,6 @@ class CameraScreen extends StatefulWidget {
 class _CameraScreenState extends State<CameraScreen> {
   late CameraController _controller;
   bool _isProcessing = false;
-  String _message = "Detecting...";
-  // String _move = "ARSHAD ... move";
 
   @override
   void initState() {
@@ -29,7 +25,7 @@ class _CameraScreenState extends State<CameraScreen> {
     _loadModel();
   }
 
-
+  // Initializes the camera
   void _initializeCamera() {
 
     _controller = CameraController(
@@ -58,7 +54,7 @@ class _CameraScreenState extends State<CameraScreen> {
         isAsset: true, // defaults to true, set to false to load resources outside assets
         useGpuDelegate: false
     );
-    print("Model loading result: $res");
+    debugPrint("Model loading result: $res");
   }
 
 
@@ -70,6 +66,7 @@ class _CameraScreenState extends State<CameraScreen> {
 
     var provider = Provider.of<ObjectDetectionProvider>(context, listen: false);
 
+    // Detect object
     var recognitions = await Tflite.detectObjectOnFrame(
       bytesList: image.planes.map((plane) => plane.bytes).toList(),
       model: "SSDMobileNet",
@@ -83,10 +80,12 @@ class _CameraScreenState extends State<CameraScreen> {
       asynch: true,
     );
 
+    // Check if detected object matches the selected object
     if (recognitions != null && recognitions.isNotEmpty &&
         recognitions.first['detectedClass'] == provider.selectedObject) {
       var detectedObject = recognitions.first;
 
+      // Only proceed if confidence level is above 50%
       if (detectedObject['confidenceInClass'] * 100 > 50) {
         provider.setBox(
           detectedObject['rect']['x'],
@@ -127,6 +126,7 @@ class _CameraScreenState extends State<CameraScreen> {
 
 
 
+  // Captures an image when the object is in the correct position
   void _captureImage() async {
     try {
       final image = await _controller.takePicture();
@@ -147,7 +147,7 @@ class _CameraScreenState extends State<CameraScreen> {
 
 
     } catch (e) {
-      print(e);
+      debugPrint(e.toString());
     }
   }
 
@@ -173,9 +173,6 @@ class _CameraScreenState extends State<CameraScreen> {
           CameraPreview(_controller),
           Consumer<ObjectDetectionProvider>(
               builder: (context, provider, child) {
-
-                // print("ARSHAD 20 ${provider.x}");
-
                 return Positioned(
                   top: (provider.y) * 700,
                   right: (provider.x) * 500,
@@ -205,23 +202,23 @@ class _CameraScreenState extends State<CameraScreen> {
             right: 20,
             child: Consumer<ObjectDetectionProvider>(
               builder: (context, provider, child) {
-        return Container(
-              padding: const EdgeInsets.all(8.0),
-              color: Colors.black54,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Text(
-                    // _message,
-                    provider.message,
-                    style: const TextStyle(color: Colors.white, fontSize: 16),
-                  ),Text(
-                    provider.moveGuidance,
-                    style: const TextStyle(color: Colors.white, fontSize: 16),
+                return Container(
+                  padding: const EdgeInsets.all(8.0),
+                  color: Colors.black54,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Text(
+                        // _message,
+                        provider.message,
+                        style: const TextStyle(color: Colors.white, fontSize: 16),
+                      ),Text(
+                        provider.moveGuidance,
+                        style: const TextStyle(color: Colors.white, fontSize: 16),
+                      ),
+                    ],
                   ),
-                ],
-              ),
             );}),
           ),
         ],

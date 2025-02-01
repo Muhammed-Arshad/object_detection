@@ -3,7 +3,7 @@ import 'package:camera/camera.dart';
 import 'package:object_detection/provider/detection_provider.dart';
 import 'package:object_detection/screens/object_selection_screen.dart';
 import 'package:provider/provider.dart';
-// import 'package:tflite/tflite.dart';
+
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
